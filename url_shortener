@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>URL Shortener</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f3f3f3;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+    .container {
+        width: 95%;
+        max-width: 500px;
+        padding: 20px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+        text-align: center;
+    }
+    input {
+        width: 100%;
+        padding: 12px;
+        margin-top: 10px;
+        border: 1px solid #aaa;
+        border-radius: 6px;
+    }
+    button {
+        width: 100%;
+        margin-top: 10px;
+        padding: 12px;
+        border: none;
+        background: #0078ff;
+        color: white;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+    button:hover {
+        background: #005fcc;
+    }
+    .result-box {
+        margin-top: 20px;
+        padding: 15px;
+        background: #e7f1ff;
+        border-radius: 6px;
+        display: none;
+    }
+    .short-url {
+        font-weight: bold;
+        color: #0060c9;
+    }
+    .list {
+        margin-top: 20px;
+    }
+    .list-item {
+        padding: 10px;
+        background: #fafafa;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        margin-bottom: 10px;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h2>URL Shortener</h2>
+
+    <input type="text" id="urlInput" placeholder="Enter URL...">
+
+    <button onclick="createShortUrl()">Shorten URL</button>
+
+    <div class="result-box" id="resultBox">
+        Shortened URL: 
+        <span class="short-url" id="shortUrl"></span>
+        <button onclick="copyShortUrl()">Copy</button>
+    </div>
+
+    <h3>Your Shortened URLs</h3>
+    <div class="list" id="urlList"></div>
+</div>
+
+<script>
+    function generateCode(length = 5) {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        let code = "";
+        for (let i = 0; i < length; i++) {
+            code += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return code;
+    }
+
+    function createShortUrl() {
+        const url = document.getElementById("urlInput").value.trim();
+        if (!url) return alert("Please enter a URL");
+
+        const code = generateCode();
+        const shortUrl = window.location.origin + "/#" + code;
+
+        // Save to LocalStorage
+        let db = JSON.parse(localStorage.getItem("urls")) || {};
+        db[code] = url;
+        localStorage.setItem("urls", JSON.stringify(db));
+
+        document.getElementById("shortUrl").innerText = shortUrl;
+        document.getElementById("resultBox").style.display = "block";
+
+        renderList();
+    }
+
+    function copyShortUrl() {
+        const shortUrl = document.getElementById("shortUrl").innerText;
+        navigator.clipboard.writeText(shortUrl);
+        alert("Copied!");
+    }
+
+    function renderList() {
+        let db = JSON.parse(localStorage.getItem("urls")) || {};
+        const list = document.getElementById("urlList");
+        list.innerHTML = "";
+
+        for (let code in db) {
+            const item = document.createElement("div");
+            item.className = "list-item";
+            item.innerHTML = `
+                <div><strong>${window.location.origin}/#${code}</strong></div>
+                <div>→ ${db[code]}</div>
+            `;
+            list.appendChild(item);
+        }
+    }
+
+    // On page load: check if user clicked a short link
+    window.onload = () => {
+        renderList();
+
+        const hash = window.location.hash.replace("#", "");
+        if (hash) {
+            let db = JSON.parse(localStorage.getItem("urls")) || {};
+            if (db[hash]) {
+                window.location.href = db[hash];
+            }
+        }
+    };
+</script>
+
+</body>
+</html>
