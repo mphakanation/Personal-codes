@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Web Dashboard</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background: #f0f2f5;
+    }
+    header {
+        background: #0078ff;
+        color: white;
+        padding: 20px;
+        text-align: center;
+        font-size: 1.5em;
+    }
+    .container {
+        padding: 20px;
+        max-width: 800px;
+        margin: auto;
+    }
+    input, select {
+        padding: 10px;
+        margin: 5px 0;
+        width: calc(100% - 22px);
+        border-radius: 6px;
+        border: 1px solid #aaa;
+    }
+    button {
+        padding: 10px 15px;
+        border: none;
+        background: #0078ff;
+        color: white;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-top: 5px;
+    }
+    button:hover {
+        background: #005fcc;
+    }
+    .task-list {
+        margin-top: 20px;
+    }
+    .task {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-left: 5px solid #0078ff;
+    }
+    .task.done {
+        border-left-color: green;
+        opacity: 0.7;
+        text-decoration: line-through;
+    }
+    @media (max-width: 600px) {
+        .task {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+</style>
+</head>
+<body>
+
+<header>Web Dashboard - Task Manager</header>
+
+<div class="container">
+    <input type="text" id="taskInput" placeholder="Enter new task...">
+    <select id="priority">
+        <option value="Low">Low Priority</option>
+        <option value="Medium" selected>Medium Priority</option>
+        <option value="High">High Priority</option>
+    </select>
+    <button onclick="addTask()">Add Task</button>
+
+    <div class="task-list" id="taskList"></div>
+</div>
+
+<script>
+let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+function saveTasks() {
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+    renderTasks();
+}
+
+function addTask() {
+    const taskInput = document.getElementById('taskInput');
+    const priority = document.getElementById('priority').value;
+    const text = taskInput.value.trim();
+    if (!text) return alert("Task cannot be empty");
+
+    const task = {
+        id: Date.now(),
+        text,
+        priority,
+        done: false
+    };
+
+    tasks.push(task);
+    taskInput.value = '';
+    saveTasks();
+}
+
+function toggleDone(id) {
+    tasks = tasks.map(t => t.id === id ? {...t, done: !t.done} : t);
+    saveTasks();
+}
+
+function deleteTask(id) {
+    tasks = tasks.filter(t => t.id !== id);
+    saveTasks();
+}
+
+function renderTasks() {
+    const taskList = document.getElementById('taskList');
+    taskList.innerHTML = '';
+
+    if (tasks.length === 0) {
+        taskList.innerHTML = '<p>No tasks yet!</p>';
+        return;
+    }
+
+    tasks.forEach(t => {
+        const div = document.createElement('div');
+        div.className = 'task' + (t.done ? ' done' : '');
+        div.innerHTML = `
+            <span>${t.text} [${t.priority}]</span>
+            <div>
+                <button onclick="toggleDone(${t.id})">${t.done ? 'Undo' : 'Done'}</button>
+                <button onclick="deleteTask(${t.id})" style="background:red">Delete</button>
+            </div>
+        `;
+        taskList.appendChild(div);
+    });
+}
+
+renderTasks();
+</script>
+
+</body>
+</html>
