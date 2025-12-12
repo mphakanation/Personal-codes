@@ -1,0 +1,55 @@
+body {
+  font-family: Arial;
+  background: #f4f4f4;
+  padding: 0;
+  margin: 0;
+}
+
+.container {
+  width: 400px;
+  margin: auto;
+  background: white;
+  padding: 25px;
+  margin-top: 50px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+.output-box {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.output-box input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.output-box button {
+  padding: 10px;
+  background: #7c3aed;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.generate {
+  width: 100%;
+  padding: 12px;
+  background: #7c3aed;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  margin-top: 20px;
+  cursor: pointer;
+}
